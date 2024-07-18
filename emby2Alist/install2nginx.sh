@@ -22,8 +22,9 @@ function install_nginx() {
 }
 
 read -p "是否安装Nginx y/n" is_install
-if [ "$api" == "y" ]; then
-    install_nginx() else
+if [ "$is_install" === "y" ]; then
+    install_nginx() 
+else
     echo "不安装Nginx"
 fi
 
