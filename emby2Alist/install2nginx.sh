@@ -1,20 +1,31 @@
 #! /bin/bash
 
-# 安装nginx和nginx-njs到ubuntu
-sudo apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
-curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
-    | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
+function install_nginx() {
 
-echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" \
-    | sudo tee /etc/apt/sources.list.d/nginx.list
+    echo "开始安装Nginx"
 
-echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-    | sudo tee /etc/apt/preferences.d/99nginx
+    # 安装nginx和nginx-njs到ubuntu
+    sudo apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor |
+        sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
 
-sudo apt update
-sudo apt install nginx nginx-module-njs -y
-# 安装nginx和nginx-njs到ubuntu end
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu $(lsb_release -cs) nginx" |
+        sudo tee /etc/apt/sources.list.d/nginx.list
+
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" |
+        sudo tee /etc/apt/preferences.d/99nginx
+
+    sudo apt update
+    sudo apt install nginx nginx-module-njs -y
+    # 安装nginx和nginx-njs到ubuntu end
+
+}
+
+read -p "是否安装Nginx y/n" is_install
+if [ "$api" == "y" ]; then
+    install_nginx() else
+    echo "不安装Nginx"
+fi
 
 script_dir=$(
     cd $(dirname $0)
