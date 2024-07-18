@@ -21,7 +21,7 @@ install_nginx() {
 
 }
 
-read -p "是否安装Nginx y/n\n" is_install
+read -p "是否安装Nginx y/n :" is_install
 if [ "$is_install" = "y" ] || [ "$is_install" = "Y" ]; then
     install_nginx
 else
@@ -38,14 +38,14 @@ sudo mv /etc/nginx/emby2alist/emby.conf /etc/nginx/conf.d/
 sudo rm -rf /etc/nginx/conf.d/includes
 sudo mv /etc/nginx/emby2alist/includes /etc/nginx/conf.d/
 
-read -p "请输入AlistAPI" api
+read -p "请输入AlistAPI :" api
 if [ ! -n "$api" ]; then
     echo "不替换AlistAPI"
 else
     echo 输入的Alist_API是：$api
     sudo sed -i "s/alsit-123456/$api/" /etc/nginx/emby2alist/config/constant-mount.js
 fi
-read -p "请输入EmbyAPI" api
+read -p "请输入EmbyAPI :" api
 if [ ! -n "$api" ]; then
     echo "不替换EmbyAPI"
 else
