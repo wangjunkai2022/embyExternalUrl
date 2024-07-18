@@ -5,6 +5,7 @@
 // 0: 不同尺寸设备共用一份缓存,先访问先缓存,空间占用最小但存在小屏先缓存大屏看的图片模糊问题
 // 1: 不同尺寸设备分开缓存,空间占用适中,命中率低下,但契合 emby 的图片缩放处理
 // 2: 不同尺寸设备共用一份缓存,空间占用最大,移除 emby 的缩放参数,直接原图高清显示
+// 3: 关闭 nginx 缓存功能,已缓存文件不做处理
 const imageCachePolicy = 0;
 
 // 对接 emby 通知管理员设置,目前只发送是否直链成功,依赖 emby/jellyfin 的 webhook 配置并勾选外部通知
@@ -45,6 +46,8 @@ const streamConfig = {
 const searchConfig = {
   // 开启脚本的部分交互性功能
   interactiveEnable: false,
+  // 快速交互,启用后将根据指令头匹配,直接返回虚拟搜索结果,不经过回源查询,优化搜索栏失焦的自动搜索
+  interactiveFast: false,
   // 限定交互性功能的隔离,取值来源为带参数的 request_uri 字符串
   // 不带协议与域名,仅作包含匹配,多个值为或的关系,空数组为不隔离
   interactiveEnableRule: [
