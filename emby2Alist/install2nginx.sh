@@ -21,7 +21,7 @@ install_nginx() {
 
 }
 
-read -p "是否安装Nginx y/n" is_install
+read -p "是否安装Nginx y/n\n" is_install
 if [ "$is_install" = "y" ] || [ "$is_install" = "Y" ]; then
     install_nginx
 else
