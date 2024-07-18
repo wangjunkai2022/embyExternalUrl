@@ -1,6 +1,6 @@
 #! /bin/bash
 
-function install_nginx() {
+install_nginx() {
 
     echo "开始安装Nginx"
 
@@ -22,8 +22,8 @@ function install_nginx() {
 }
 
 read -p "是否安装Nginx y/n" is_install
-if [ "$is_install" = "y" ] || [ "$is_install" = "Y" ] ; then
-    install_nginx() 
+if [ "$is_install" = "y" ] || [ "$is_install" = "Y" ]; then
+    install_nginx
 else
     echo "不安装Nginx"
 fi
