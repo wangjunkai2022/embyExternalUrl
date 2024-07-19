@@ -32,6 +32,7 @@ script_dir=$(
     cd $(dirname $0)
     pwd
 )
+sudo cp -r $script_dir/nginx/nginx.conf /etc/nginx/nginx.conf
 sudo rm -rf /etc/nginx/emby2alist
 sudo cp -r $script_dir/nginx/conf.d /etc/nginx/emby2alist/
 sudo mv /etc/nginx/emby2alist/emby.conf /etc/nginx/conf.d/
