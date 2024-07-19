@@ -48,7 +48,7 @@ services:
       - /etc/passwd:/etc/passwd:ro
       - /etc/group:/etc/group:ro
       - .config/rclone:/config/rclone
-      - /mnt:/data:shared
+      - /mnt/alist:/data:shared
     devices:
       - /dev/fuse:/dev/fuse
     cap_add:

@@ -1,0 +1,18 @@
+services:
+  rclone_temp:
+    container_name: rclone_temp
+    image: rclone/rclone:latest
+    network_mode: host
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - .config/rclone:/config/rclone
+      - /mnt/rclone_temp:/data:shared
+    devices:
+      - /dev/fuse:/dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    restart: "no"
+    command: mount rclone_temp:/ /data --allow-other --allow-non-empty --file-perms 0777 --multi-thread-streams 1024 --multi-thread-cutoff 128M --network-mode --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 12h --buffer-size 64K --vfs-read-chunk-size 1M --vfs-read-chunk-size-limit 50M --no-modtime --no-checksum --vfs-read-wait 0ms -v --ignore-size
