@@ -77,7 +77,6 @@ services:
       - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/nginx/emby2alist:/etc/nginx/emby2alist/
       - /etc/nginx/conf.d:/etc/nginx/conf.d
-      - /etc/nginx/logs/debug:/etc/nginx/logs/debug
       - /etc/nginx/embyCache:/var/cache/nginx/emby
     restart: unless-stopped
     
