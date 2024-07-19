@@ -1,50 +1,83 @@
-version: '3.5'
-
+# yaml 配置
+name: yoyo_media_server
 services:
+  yoyo_emby:
+    container_name: yoyo_emby
+    image: amilys/embyserver:latest
+    environment:
+    #   - HTTP_PROXY=${PROXY}
+    #   - HTTPS_PROXY=${PROXY}
+    #   - NO_PROXY=127.0.0.1,localhost,192.168.*
+    #   - PUID=0
+    #   - PGID=0
+        - TZ=Asia/Hong_Kong
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /var/lib/emby:/config
+      - /mnt:/mnt
+      - /media:/media
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    depends_on:
+       - yoyo_rclone_alist
+       - yoyo_alist
 
-    service.nginx-emby:
-      image: nginx:latest
-      container_name: nginx-emby
-      # 更改为默认host网络,纠正流量标识,直接占用宿主机端口,docker层会禁用端口映射
-      network_mode: host
-      # 如果需要使用bridge(桥接)网络,请取消ports(端口映射)注释,并注释network_mode
-      # 端口映射规则为,宿主机端口:容器内部端口
-      # ports:
-      #   - 8091:8091
-      #   - 8095:8095
-      # 如果遇到海报全部裂开或日志中 permission denied,以下二选一
-      # 还不行的话,自己给宿主机 embyCache 读写权限
-      # privileged: true
-      # entrypoint: |
-      #   /bin/sh -c "chmod -R 777 /var/cache/nginx/emby"
-      volumes:
-        - ../nginx/nginx.conf:/etc/nginx/nginx.conf
-        - ../nginx/conf.d:/etc/nginx/conf.d
-        - ../nginx/embyCache:/var/cache/nginx/emby
-        - ../nginx/log:/var/log/nginx
-      restart: always
-      # depends_on:
-      #   - service.ali
 
-    service.ali:
-      image: xhofe/alist:latest
-      container_name: alist
-      ports:
-        - 5244:5244
-      volumes:
-        - ../alist:/opt/alist/data
-      restart: always
+  yoyo_alist:
+    container_name: yoyo_alist
+    environment:
+      - TZ=Asia/Hong_Kong
+    image: xhofe/alist:latest
+    volumes:
+      - /opt/alist/data:/opt/alist/data
+      - /mnt:/mnt
+      - /media:/media
+    ports:
+      - 5244:5244
+    depends_on:
+      - yoyo_rclone_alist
+    restart: unless-stopped
+    
+  yoyo_rclone_alist:
+    container_name: yoyo_rclone_alist
+    image: rclone/rclone:latest
+    network_mode: host
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - .config/rclone:/config/rclone
+      - /mnt:/data:shared
+    devices:
+      - /dev/fuse:/dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    restart: unless-stopped
+    command: mount alist_webdav:/ /data --allow-other --allow-non-empty --file-perms 0777 --multi-thread-streams 1024 --multi-thread-cutoff 128M --network-mode --vfs-cache-mode full --vfs-cache-max-size 10G --vfs-cache-max-age 12h --buffer-size 64K --vfs-read-chunk-size 1M --vfs-read-chunk-size-limit 50M --no-modtime --no-checksum --vfs-read-wait 0ms -v --ignore-size
 
-    # service.ali-webdav:
-    #   image: messense/aliyundrive-webdav
-    #   container_name: ali-webdav
-    #   ports:
-    #     - 8080:8080
-    #   volumes:
-    #     - ./aliyundrive-webdav/:/etc/aliyundrive-webdav/
-    #   environment:
-    #     - REFRESH_TOKEN=1111111111111aaaaaaaaaa
-    #     - WEBDAV_AUTH_USER=admin
-    #     - WEBDAV_AUTH_PASSWORD=admin
-    #   restart: always
 
+  yoyo_nginx:
+    container_name: yoyo_nginx
+    environment:
+      - TZ=Asia/Hong_Kong
+    image: nginx:latest
+    network_mode: host
+    # 如果遇到海报全部裂开或日志中 permission denied,以下二选一
+    # 还不行的话,自己给宿主机 embyCache 读写权限
+    # privileged: true
+    # entrypoint: |
+    #   /bin/sh -c "chmod -R 777 /var/cache/nginx/emby"
+    depends_on:
+      - yoyo_emby
+    volumes:
+      # - /etc/nginx:/etc/nginx
+      - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /etc/nginx/emby2alist:/etc/nginx/emby2alist/
+      - /etc/nginx/conf.d:/etc/nginx/conf.d
+      - /etc/nginx/logs/debug:/etc/nginx/logs/debug
+      - /etc/nginx/embyCache:/var/cache/nginx/emby
+    restart: unless-stopped
+    
